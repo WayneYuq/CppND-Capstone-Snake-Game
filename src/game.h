@@ -11,7 +11,7 @@ class Game {
  public:
   Game(std::size_t grid_width, std::size_t grid_height);
   void Run(Controller const &controller, Renderer &renderer,
-           std::size_t target_frame_duration);
+           std::size_t target_frame_duration, std::size_t kReduceIntervals);
   int GetScore() const;
   int GetSize() const;
 
@@ -28,6 +28,7 @@ class Game {
 
   void PlaceFood();
   void Update();
+  bool reducing{false};
 };
 
 #endif

@@ -10,12 +10,15 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
   PlaceFood();
 }
 
-void Game::Run(Controller const &controller, Renderer &renderer,
-               std::size_t target_frame_duration) {
+void Game::Run(Controller const &controller,
+               Renderer &renderer, 
+               std::size_t target_frame_duration, 
+               std::size_t kReduceIntervals) {
   Uint32 title_timestamp = SDL_GetTicks();
   Uint32 frame_start;
   Uint32 frame_end;
   Uint32 frame_duration;
+  Uint32 reduce_timestamp = SDL_GetTicks();
   int frame_count = 0;
   bool running = true;
 
@@ -41,6 +44,12 @@ void Game::Run(Controller const &controller, Renderer &renderer,
       title_timestamp = frame_end;
     }
 
+    // Reduce a cell of body every kReduceIntervals
+    if (frame_end - reduce_timestamp >= kReduceIntervals) {
+      reducing = true;
+      reduce_timestamp = frame_end;
+    }
+    
     // If the time for this frame is too small (i.e. frame_duration is
     // smaller than the target ms_per_frame), delay the loop to
     // achieve the correct frame rate.
@@ -69,7 +78,12 @@ void Game::Update() {
   if (!snake.alive) return;
 
   snake.Update();
-
+  
+  if (reducing) {
+    snake.ReduceBody();
+    reducing = false;
+  }
+  
   int new_x = static_cast<int>(snake.head_x);
   int new_y = static_cast<int>(snake.head_y);
 
@@ -79,7 +93,6 @@ void Game::Update() {
     PlaceFood();
     // Grow snake and increase speed.
     snake.GrowBody();
-    snake.speed += 0.02;
   }
 }
 

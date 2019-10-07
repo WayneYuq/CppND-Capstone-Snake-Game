@@ -2,6 +2,7 @@
 #define SNAKE_H
 
 #include <vector>
+#include <mutex>
 #include "SDL.h"
 
 class Snake {
@@ -15,7 +16,7 @@ class Snake {
         head_y(grid_height / 2) {}
 
   void Update();
-
+  void ReduceBody();
   void GrowBody();
   bool SnakeCell(int x, int y);
 
@@ -35,6 +36,7 @@ class Snake {
   bool growing{false};
   int grid_width;
   int grid_height;
+  std::mutex _mtx;
 };
 
 #endif

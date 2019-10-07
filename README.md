@@ -29,3 +29,11 @@ In this project, you can build your own C++ application or extend this Snake gam
 2. Make a build directory in the top level directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
 4. Run it: `./SnakeGame`.
+
+## Update code efficient
+1. Add reference to snake `void Renderer::Render(Snake const &snake, SDL_Point const &food)`.
+2. Add const to parameters `void Renderer::UpdateWindowTitle(const int score, const int fps)`.
+3. Add a feature that reduce a body cell every kReduceIntervals.
+4. Add `constexpr std::size_t kReduceIntervals{8000};` to main.cpp to control the interval of reduce body.
+5. Using multithreading for growbody and reducebody.
+6. Add `lock_guard` and `unique_lock` to protect thread.

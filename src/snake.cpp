@@ -47,6 +47,7 @@ void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell) 
   // Add previous head location to vector
   body.push_back(prev_head_cell);
 
+  std::unique_lock<std::mutex> lock(_mtx);
   if (!growing) {
     // Remove the tail from the vector.
     body.erase(body.begin());
@@ -54,7 +55,8 @@ void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell) 
     growing = false;
     size++;
   }
-
+  lock.unlock();
+  
   // Check if the snake has died.
   for (auto const &item : body) {
     if (current_head_cell.x == item.x && current_head_cell.y == item.y) {
@@ -63,7 +65,21 @@ void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell) 
   }
 }
 
-void Snake::GrowBody() { growing = true; }
+void Snake::ReduceBody() {
+  std::cout << "reduce every kReduceIntervals" << "\n";
+  std::lock_guard<std::mutex> lock(_mtx);
+  if (size > 1) {
+    body.erase(body.begin());
+    speed -= 0.02;
+    size--;
+  }
+}
+
+void Snake::GrowBody() {
+  std::lock_guard<std::mutex> lock(_mtx);
+  growing = true;
+  speed += 0.02;
+}
 
 // Inefficient method to check if cell is occupied by snake.
 bool Snake::SnakeCell(int x, int y) {
